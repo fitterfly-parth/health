@@ -1315,7 +1315,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
             .setTimeRange(start, end, TimeUnit.MILLISECONDS)
             .build()
 
-        Fitness.getRecordingClient(context, gsa).readData(request)
+        Fitness.getHistoryClient(context, gsa).readData(request)
             .addOnFailureListener(
                 errHandler(
                     result,
