@@ -1307,11 +1307,11 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
             .setStreamName("estimated_steps")
             .build()
 
-//        val duration = (end - start).toInt()
+        val duration = (end - start).toInt()
 
         val request = DataReadRequest.Builder()
             .aggregate(ds)
-            .bucketByTime(86400000, TimeUnit.MILLISECONDS)
+            .bucketByTime(duration, TimeUnit.MILLISECONDS)
             .setTimeRange(start, end, TimeUnit.MILLISECONDS)
             .build()
 
