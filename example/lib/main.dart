@@ -209,7 +209,7 @@ class _HealthAppState extends State<HealthApp> {
 
   /// Fetch steps from the health plugin and show them in the app.
   Future fetchStepData() async {
-    int? steps;
+    dynamic steps;
 
     // get steps for today (i.e., since midnight)
     final now = DateTime.now();

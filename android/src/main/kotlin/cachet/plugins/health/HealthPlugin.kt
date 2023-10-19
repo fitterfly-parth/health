@@ -1376,9 +1376,9 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                 }
             }
 
-            assert(map.size <= 1) { "getTotalStepsInInterval should return only one interval. Found: ${map.size}" }
+//            assert(map.size <= 1) { "getTotalStepsInInterval should return only one interval. Found: ${map.size}" }
             Handler(context!!.mainLooper).run {
-                result.success(map.values.firstOrNull())
+                result.success(map)
             }
         }
 
