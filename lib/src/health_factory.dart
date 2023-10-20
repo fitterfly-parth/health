@@ -532,7 +532,7 @@ class HealthFactory {
       'startTime': startTime.millisecondsSinceEpoch,
       'endTime': endTime.millisecondsSinceEpoch
     };
-    final stepsCount = await _channel.invokeMethod<int?>(
+    final stepsCount = await _channel.invokeMethod<dynamic>(
       'getTotalStepsInInterval',
       args,
     );
