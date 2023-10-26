@@ -903,7 +903,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
             ) == PackageManager.PERMISSION_GRANTED) {
             typesBuilder.accessActivitySessions(FitnessOptions.ACCESS_READ)
                 .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_READ)
+//                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_READ)
         } else if (dataType == DataType.TYPE_ACTIVITY_SEGMENT) {
             typesBuilder.accessActivitySessions(FitnessOptions.ACCESS_READ)
                 .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
