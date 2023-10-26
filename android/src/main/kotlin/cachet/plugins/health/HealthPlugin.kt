@@ -939,24 +939,24 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                     .read(DataType.TYPE_CALORIES_EXPENDED)
 
                 // If fine location is enabled, read distance data
-                if (ContextCompat.checkSelfPermission(
-                        activity!!.applicationContext,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // Request permission with distance data.
-                    // Google Fit requires this when we query for distance data
-                    // as it is restricted data
-                    if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
-                        GoogleSignIn.requestPermissions(
-                            activity!!, // your activity
-                            GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
-                            googleSignInAccount,
-                            fitnessOptions
-                        )
-                    }
-                    readRequestBuilder.read(DataType.TYPE_DISTANCE_DELTA)
-                }
+//                if (ContextCompat.checkSelfPermission(
+//                        activity!!.applicationContext,
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION
+//                    ) == PackageManager.PERMISSION_GRANTED
+//                ) {
+//                    // Request permission with distance data.
+//                    // Google Fit requires this when we query for distance data
+//                    // as it is restricted data
+//                    if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
+//                        GoogleSignIn.requestPermissions(
+//                            activity!!, // your activity
+//                            GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+//                            googleSignInAccount,
+//                            fitnessOptions
+//                        )
+//                    }
+//                    readRequestBuilder.read(DataType.TYPE_DISTANCE_DELTA)
+//                }
                 readRequest = readRequestBuilder.build()
                 Fitness.getSessionsClient(activity!!.applicationContext, googleSignInAccount)
                     .readSession(readRequest)
