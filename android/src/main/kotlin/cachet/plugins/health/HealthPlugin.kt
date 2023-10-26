@@ -898,14 +898,20 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
         // Add special cases for accessing workouts or sleep data.
         if (dataType == DataType.TYPE_SLEEP_SEGMENT) {
             typesBuilder.accessSleepSessions(FitnessOptions.ACCESS_READ)
-        } else if (dataType == DataType.TYPE_ACTIVITY_SEGMENT) {
+        } else if (dataType == DataType.TYPE_ACTIVITY_SEGMENT && ContextCompat.checkSelfPermission(
+                activity!!.applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED) {
             typesBuilder.accessActivitySessions(FitnessOptions.ACCESS_READ)
                 .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
                 .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_READ)
+        } else if (dataType == DataType.TYPE_ACTIVITY_SEGMENT) {
+            typesBuilder.accessActivitySessions(FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
         }
         val fitnessOptions = typesBuilder.build()
+
         val googleSignInAccount =
-            GoogleSignIn.getAccountForExtension(context!!.applicationContext, fitnessOptions)
+            GoogleSignIn.getAccountForExtension(activity!!.applicationContext, fitnessOptions)
         // Handle data types
         when (dataType) {
             DataType.TYPE_SLEEP_SEGMENT -> {
@@ -916,15 +922,11 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                     .readSessionsFromAllApps()
                     .includeSleepSessions()
                     .build()
-                Fitness.getSessionsClient(context!!.applicationContext, googleSignInAccount)
+                Fitness.getSessionsClient(activity!!.applicationContext, googleSignInAccount)
                     .readSession(request)
                     .addOnSuccessListener(threadPoolExecutor!!, sleepDataHandler(type, result))
-                    .addOnFailureListener(
-                        errHandler(
-                            result,
-                            "There was an error getting the sleeping data!",
-                        ),
-                    )
+                    .addOnFailureListener(errHandler(result))
+
             }
             DataType.TYPE_ACTIVITY_SEGMENT -> {
                 val readRequest: SessionReadRequest
@@ -938,43 +940,42 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
 
                 // If fine location is enabled, read distance data
                 if (ContextCompat.checkSelfPermission(
-                        context!!.applicationContext,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        activity!!.applicationContext,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
+                    // Request permission with distance data.
+                    // Google Fit requires this when we query for distance data
+                    // as it is restricted data
+                    if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
+                        GoogleSignIn.requestPermissions(
+                            activity!!, // your activity
+                            GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+                            googleSignInAccount,
+                            fitnessOptions
+                        )
+                    }
                     readRequestBuilder.read(DataType.TYPE_DISTANCE_DELTA)
                 }
                 readRequest = readRequestBuilder.build()
-                Fitness.getSessionsClient(context!!.applicationContext, googleSignInAccount)
+                Fitness.getSessionsClient(activity!!.applicationContext, googleSignInAccount)
                     .readSession(readRequest)
                     .addOnSuccessListener(threadPoolExecutor!!, workoutDataHandler(type, result))
-                    .addOnFailureListener(
-                        errHandler(
-                            result,
-                            "There was an error getting the workout data!",
-                        ),
-                    )
+                    .addOnFailureListener(errHandler(result))
             }
             else -> {
-                Fitness.getHistoryClient(context!!.applicationContext, googleSignInAccount)
+                Fitness.getHistoryClient(activity!!.applicationContext, googleSignInAccount)
                     .readData(
                         DataReadRequest.Builder()
                             .read(dataType)
                             .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                            .build(),
+                            .build()
                     )
-                    .addOnSuccessListener(
-                        threadPoolExecutor!!,
-                        dataHandler(dataType, field, result),
-                    )
-                    .addOnFailureListener(
-                        errHandler(
-                            result,
-                            "There was an error getting the data!",
-                        ),
-                    )
+                    .addOnSuccessListener(threadPoolExecutor!!, dataHandler(dataType, field, result))
+                    .addOnFailureListener(errHandler(result))
             }
         }
+
     }
 
     private fun dataHandler(dataType: DataType, field: Field, result: Result) =
