@@ -925,7 +925,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                 Fitness.getSessionsClient(activity!!.applicationContext, googleSignInAccount)
                     .readSession(request)
                     .addOnSuccessListener(threadPoolExecutor!!, sleepDataHandler(type, result))
-                    .addOnFailureListener(errHandler(result))
+                    .addOnFailureListener(errHandler(result, "There was an error getting the sleeping data!",))
 
             }
             DataType.TYPE_ACTIVITY_SEGMENT -> {
@@ -961,7 +961,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                 Fitness.getSessionsClient(activity!!.applicationContext, googleSignInAccount)
                     .readSession(readRequest)
                     .addOnSuccessListener(threadPoolExecutor!!, workoutDataHandler(type, result))
-                    .addOnFailureListener(errHandler(result))
+                    .addOnFailureListener(errHandler(result, "There was an error getting the Workout data!",))
             }
             else -> {
                 Fitness.getHistoryClient(activity!!.applicationContext, googleSignInAccount)
@@ -972,7 +972,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                             .build()
                     )
                     .addOnSuccessListener(threadPoolExecutor!!, dataHandler(dataType, field, result))
-                    .addOnFailureListener(errHandler(result))
+                    .addOnFailureListener(errHandler(result, "There was an error getting data!",))
             }
         }
 
