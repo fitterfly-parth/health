@@ -1302,7 +1302,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
         val gsa = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
 
         val ds = DataSource.Builder()
-            .setAppPackageName("com.google.android.gms")
+//            .setAppPackageName("com.google.android.gms")
             .setDataType(stepsDataType)
             .setType(DataSource.TYPE_DERIVED)
             .setStreamName("estimated_steps")
