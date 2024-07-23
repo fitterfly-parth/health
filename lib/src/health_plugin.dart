@@ -839,7 +839,7 @@ class Health {
   /// Returns null if not successful.
   ///
   /// Is a fix according to https://stackoverflow.com/questions/29414386/step-count-retrieved-through-google-fit-api-does-not-match-step-count-displayed/29415091#29415091
-  Future<int?> getTotalStepsInInterval(
+  Future<dynamic> getTotalStepsInInterval(
     DateTime startTime,
     DateTime endTime,
   ) async {
@@ -847,7 +847,7 @@ class Health {
       'startTime': startTime.millisecondsSinceEpoch,
       'endTime': endTime.millisecondsSinceEpoch
     };
-    final stepsCount = await _channel.invokeMethod<int?>(
+    final stepsCount = await _channel.invokeMethod<dynamic>(
       'getTotalStepsInInterval',
       args,
     );
