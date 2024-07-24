@@ -1325,21 +1325,27 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
         // Add special cases for accessing workouts or sleep data.
         if (dataType == DataType.TYPE_SLEEP_SEGMENT) {
             typesBuilder.accessSleepSessions(FitnessOptions.ACCESS_READ)
-        } else if (dataType == DataType.TYPE_ACTIVITY_SEGMENT) {
+        } else if (dataType == DataType.TYPE_ACTIVITY_SEGMENT && ContextCompat.checkSelfPermission(
+                activity!!.applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             typesBuilder.accessActivitySessions(FitnessOptions.ACCESS_READ)
                 .addDataType(
                     DataType.TYPE_CALORIES_EXPENDED,
                     FitnessOptions.ACCESS_READ
                 )
-                .addDataType(
-                    DataType.TYPE_DISTANCE_DELTA,
-                    FitnessOptions.ACCESS_READ
-                )
+            /*.addDataType(
+                DataType.TYPE_DISTANCE_DELTA,
+                FitnessOptions.ACCESS_READ
+            )*/
+        } else if (dataType == DataType.TYPE_ACTIVITY_SEGMENT) {
+            typesBuilder.accessActivitySessions(FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
         }
         val fitnessOptions = typesBuilder.build()
         val googleSignInAccount =
             GoogleSignIn.getAccountForExtension(
-                context!!.applicationContext,
+                activity!!.applicationContext,
                 fitnessOptions
             )
         // Handle data types
@@ -1358,7 +1364,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                         .includeSleepSessions()
                         .build()
                 Fitness.getSessionsClient(
-                    context!!.applicationContext,
+                    activity!!.applicationContext,
                     googleSignInAccount
                 )
                     .readSession(request)
@@ -1393,16 +1399,27 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
 
                 // If fine location is enabled, read distance data
                 if (ContextCompat.checkSelfPermission(
-                        context!!.applicationContext,
+                        activity!!.applicationContext,
                         android.Manifest.permission
                             .ACCESS_FINE_LOCATION,
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    readRequestBuilder.read(DataType.TYPE_DISTANCE_DELTA)
+                    // Request permission with distance data.
+                    // Google Fit requires this when we query for distance data
+                    // as it is restricted data
+                    if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
+                        GoogleSignIn.requestPermissions(
+                            activity!!, // your activity
+                            GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+                            googleSignInAccount,
+                            fitnessOptions
+                        )
+                    }
+//                    readRequestBuilder.read(DataType.TYPE_DISTANCE_DELTA)
                 }
                 readRequest = readRequestBuilder.build()
                 Fitness.getSessionsClient(
-                    context!!.applicationContext,
+                    activity!!.applicationContext,
                     googleSignInAccount
                 )
                     .readSession(readRequest)
@@ -1420,7 +1437,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
 
             else -> {
                 Fitness.getHistoryClient(
-                    context!!.applicationContext,
+                    activity!!.applicationContext,
                     googleSignInAccount
                 )
                     .readData(
