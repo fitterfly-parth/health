@@ -2474,17 +2474,22 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
     }
 
     private fun installHealthConnect(call: MethodCall, result: Result) {
-        val uriString =
-            "market://details?id=com.google.android.apps.healthdata&url=healthconnect%3A%2F%2Fonboarding"
-        context!!.startActivity(
-            Intent(Intent.ACTION_VIEW).apply {
-                setPackage("com.android.vending")
-                data = Uri.parse(uriString)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                putExtra("overlay", true)
-                putExtra("callerId", context!!.packageName)
-            }
-        )
+//        val uriString =
+//            "market://details?id=com.google.android.apps.healthdata&url=healthconnect%3A%2F%2Fonboarding"
+//        context!!.startActivity(
+//            Intent(Intent.ACTION_VIEW).apply {
+//                setPackage("com.android.vending")
+//                data = Uri.parse(uriString)
+//                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                putExtra("overlay", true)
+//                putExtra("callerId", context!!.packageName)
+//            }
+//        )
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.healthdata")))
+        } catch (e: ActivityNotFoundException) {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata")))
+        }
         result.success(null)
     }
 
