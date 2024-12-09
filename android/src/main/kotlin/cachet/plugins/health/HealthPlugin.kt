@@ -2443,7 +2443,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
             PermissionController.createRequestPermissionResultContract()
 
         healthConnectRequestPermissionsLauncher =
-            (activity as Activity).registerForActivityResult(
+            (activity as AppCompatActivity).registerForActivityResult(
                 requestPermissionActivityContract
             ) { granted -> onHealthConnectPermissionCallback(granted) }
     }
