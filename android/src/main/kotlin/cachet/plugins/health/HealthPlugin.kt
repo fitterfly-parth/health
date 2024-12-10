@@ -2433,15 +2433,15 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-//        if (channel == null) {
-//            return
-//        }
-//        binding.addActivityResultListener(this)
-//        activity = binding.activity
-//
-//        val requestPermissionActivityContract =
-//            PermissionController.createRequestPermissionResultContract()
-//
+        if (channel == null) {
+            return
+        }
+        binding.addActivityResultListener(this)
+        activity = binding.activity
+
+        val requestPermissionActivityContract =
+            PermissionController.createRequestPermissionResultContract()
+
 //        healthConnectRequestPermissionsLauncher =
 //            (activity as ComponentActivity).registerForActivityResult(
 //                requestPermissionActivityContract
